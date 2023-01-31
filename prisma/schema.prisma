@@ -42,10 +42,11 @@ model book {
   id            Int               @id @default(autoincrement())
   title         String
   cover         String
-  description   String
+  description   String            @db.Text
   published_at  Int
   total_page    Int
   author_id     Int
+  stock         Int               @default(0)
   created_at    DateTime          @default(now())
   author        author            @relation(fields: [author_id], references: [id], onDelete: Cascade)
   order         order[]
