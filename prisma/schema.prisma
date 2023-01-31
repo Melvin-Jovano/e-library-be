@@ -7,20 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Jwt {
+enum Role {
+  USER
+  ADMIN
+}
+
+model jwt {
   id            Int      @id @default(autoincrement())
   user_id       Int
   refresh_token String
   created_at    DateTime @default(now())
-  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model User {
+model user {
   id          Int               @id @default(autoincrement())
   photo       String?
   username    String            @unique
   name        String
   password    String
+  role        Role              @default(USER)
   created_at  DateTime          @default(now())
-  jwt         Jwt[]
+  jwt         jwt[]
+  order       order[]
+}
+
+model author {
+  id          Int               @id @default(autoincrement())
+  created_at  DateTime          @default(now())
+  books       book[]
+}
+
+model book {
+  id            Int               @id @default(autoincrement())
+  title         String
+  cover         String
+  description   String
+  published_at  Int
+  total_page    Int
+  author_id     Int
+  created_at    DateTime          @default(now())
+  author        author            @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  order         order[]
+}
+
+model order {
+  id            Int               @id @default(autoincrement())
+  user_id       Int
+  book_id       Int
+  created_at    DateTime          @default(now())
+  user          user              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  book          book              @relation(fields: [book_id], references: [id], onDelete: Cascade)
 }
