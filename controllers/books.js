@@ -111,6 +111,41 @@ export const getAllBooks = async (req,res)=>{
     }
 }
 
+export const getBookById = async (req, res)=>{
+    try {
+        const { bookId } = req.params
+        const book = await prisma.book.findUnique({
+            where:{
+                id: parseInt(bookId)
+            },
+            select:{
+                id : true,
+                title : true,
+                cover : true,
+                description : true,
+                published_at : true,
+                total_page : true,
+                stock : true,
+                author : {
+                    select : {
+                        id : true,
+                        name : true
+                    }
+                }
+            }
+        })
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: book
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({
+            message : "An Error Has Occured",
+        });
+    }
+}
+
 export const updateBook = async (req,res)=>{
     try {
         const { bookId, stock } = req.body
