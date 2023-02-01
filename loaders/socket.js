@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { createServer } from "http";
-import { validateAccessToken } from "../middlewares/jwt_socket.js";
+import { validateAccessTokenUser } from "../middlewares/jwt_socket.js";
 
 export default class SocketLoader {
     constructor(app, port, room) {

@@ -8,8 +8,8 @@ const config = {
     ACCESS_TOKEN_SECRET_USER: 'roses-are-red',
     REFRESH_TOKEN_SECRET_USER: 'violets-are-blue',
 
-    ACCESS_TOKEN_SECRET_ADMIN: 'roses-are-red',
-    REFRESH_TOKEN_SECRET_ADMIN: 'violets-are-blue'
+    ACCESS_TOKEN_SECRET_ADMIN: 'roses-are-blue',
+    REFRESH_TOKEN_SECRET_ADMIN: 'violets-are-red'
 }
 
 export default config;
