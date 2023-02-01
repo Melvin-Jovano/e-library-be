@@ -8,7 +8,7 @@ import { validateUsername } from '../utils/app.js';
 const { sign, verify } = pkg;
 const prisma = new PrismaClient();
 
-export const loginUser = async ( req, res ) => {
+export const login = async ( req, res ) => {
     try {
         const {username, password} = req.body;
 
@@ -26,8 +26,7 @@ export const loginUser = async ( req, res ) => {
                 const accessToken = sign({
                     userId: getUserByUsernameAndPassword.id
                 }, config.ACCESS_TOKEN_SECRET_USER, {
-                    // TODO Uncomment When Production
-                    // expiresIn: '10m'
+                    expiresIn: '10m'
                 });
 
                 const refresh_token = sign({
@@ -51,6 +50,7 @@ export const loginUser = async ( req, res ) => {
                         username: getUserByUsernameAndPassword.username,
                         name: getUserByUsernameAndPassword.name,
                         photo: getUserByUsernameAndPassword.photo,
+                        role: getUserByUsernameAndPassword.role,
                         joinedSince: getUserByUsernameAndPassword.created_at,
                     }
                 });
@@ -70,7 +70,7 @@ export const loginUser = async ( req, res ) => {
     }
 }
 
-export const logoutUser = async ( req, res ) => {
+export const logout = async ( req, res ) => {
     try {
         const {refreshToken} = req.body;
 
@@ -130,7 +130,7 @@ export const refreshTokenUser = async ( req, res ) => {
                 message: `SUCCESS`,
                 data: {
                     accessToken,
-                    refresh_token
+                    refreshToken: refresh_token
                 }
             });
         } 
@@ -204,88 +204,6 @@ export const registerUser = async ( req, res ) => {
     }
 }
 
-
-export const loginAdmin = async ( req, res ) => {
-    try {
-        const {username, password} = req.body;
-
-        // Check If Username Exist
-        const getUserByUsernameAndPassword = await prisma.user.findFirst({
-            where: {
-                username
-            }
-        });
-        if(getUserByUsernameAndPassword !== null) {
-            // Check Password
-            const isPasswordMatch = bycrypt.compareSync(password, getUserByUsernameAndPassword.password);
-
-            if(isPasswordMatch) {
-                const accessToken = sign({
-                    userId: getUserByUsernameAndPassword.id
-                }, config.ACCESS_TOKEN_SECRET_ADMIN, {
-                    // TODO Uncomment When Production
-                    // expiresIn: '10m'
-                });
-
-                const refresh_token = sign({
-                    userId: getUserByUsernameAndPassword.id
-                }, config.REFRESH_TOKEN_SECRET_ADMIN);
-
-                // Insert New Token
-                await prisma.jwt.create({
-                    data: {
-                        user_id: getUserByUsernameAndPassword.id,
-                        refresh_token,
-                    }
-                });
-
-                return res.status(200).send({
-                    message: 'SUCCESS',
-                    data: {
-                        accessToken,
-                        refreshToken: refresh_token,
-                        userId: getUserByUsernameAndPassword.id,
-                        username: getUserByUsernameAndPassword.username,
-                        name: getUserByUsernameAndPassword.name,
-                        photo: getUserByUsernameAndPassword.photo,
-                        joinedSince: getUserByUsernameAndPassword.created_at,
-                    }
-                });
-            }
-            return res.status(404).send({
-                message: 'No User Found With Given Username / Password',
-            });
-        }
-
-        return res.status(404).send({
-            message: 'No User Found',
-        });
-    } catch (error) {
-        return res.status(500).send({
-            message : 'An Error Has Occured'
-        });
-    }
-}
-
-export const logoutAdmin = async ( req, res ) => {
-    try {
-        const {refreshToken} = req.body;
-
-        await prisma.jwt.deleteMany({
-            where: {
-                refresh_token: refreshToken
-            }
-        });
-        return res.status(204).send({
-            message: `SUCCESS`,
-        });
-    } catch (error) {
-        return res.status(500).send({
-            message : 'An Error Has Occured'
-        });
-    }
-}
-
 export const refreshTokenAdmin = async ( req, res ) => {
     try {
         const {refreshToken} = req.body;
@@ -327,7 +245,7 @@ export const refreshTokenAdmin = async ( req, res ) => {
                 message: `SUCCESS`,
                 data: {
                     accessToken,
-                    refresh_token
+                    refreshToken: refresh_token
                 }
             });
         } 
