@@ -29,11 +29,38 @@ export const upload = multer({
     }
 })
 
+const createAuthor = async (val)=>{
+    const newAuthor = await prisma.author.create({
+        data:{
+            name: val.toLowerCase()
+        },
+        select:{
+            id: true
+        }
+    })
+    return newAuthor
+}
+
 export const inputBook = async (req, res)=>{
     try {
         const coverImg = req.file.filename
         const fileUrl = `/images/${coverImg}`;
-        const {title, description, published, pages, authorId, stock} = req.body
+        const {title, description, published, pages, authorName, stock} = req.body
+        const author = await prisma.author.findFirst({
+            where:{
+                name : authorName.toLowerCase()
+            },
+            select:{
+                id: true
+            }
+        })
+        let authorId;
+        if(author !== null){
+            authorId = author.id
+        }
+        else{
+            authorId = (await createAuthor(authorName)).id
+        }
         const book = await prisma.book.create({
             data:{
                 title : title,
