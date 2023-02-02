@@ -14,7 +14,7 @@ export default class SocketLoader {
             }
         });
 
-        this.socket = this.io.of(`/${room}`);
+        this.socket = this.io.of(`${room}`);
         this.io.listen(port);
         this.socket.use(validateAccessTokenUser);
 
