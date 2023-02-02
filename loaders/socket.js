@@ -33,8 +33,37 @@ export default class SocketLoader {
                             user_id: body.userId
                         }
                     });
-
+                    await prisma.book.update({
+                        where: {
+                            id: body.bookId
+                        },
+                        data: {
+                            stock: {
+                                decrement: 1
+                            }
+                        }
+                    });
                     socket.emit('created-order', order);
+                });
+
+                socket.on('delete-order', async (body) => {
+                    const order = await prisma.order.deleteMany({
+                        where: {
+                            book_id: body.bookId,
+                            user_id: body.userId
+                        },
+                    });
+                    await prisma.book.update({
+                        where: {
+                            id: body.bookId
+                        },
+                        data: {
+                            stock: {
+                                increment: 1
+                            }
+                        }
+                    });
+                    socket.emit('deleted-order', {user_id: body.userId});
                 });
             }
         });
