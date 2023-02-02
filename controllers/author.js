@@ -16,7 +16,7 @@ export const getAllAuthors = async (req,res)=>{
     }
 }
 
-export const createAuthor = async ()=>{
+export const createAuthor = async (req, res)=>{
     try {
         const { authorName } = req.body
         const newAuthor = await prisma.author.create({
@@ -32,6 +32,7 @@ export const createAuthor = async ()=>{
             data: newAuthor
         });
     } catch (error) {
+        console.log(error)
         return res.status(500).send({
             message : "An Error Has Occured",
         });
