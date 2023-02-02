@@ -16,7 +16,7 @@ export const getAllAuthors = async (req,res)=>{
     }
 }
 
-export const createAuthor = async ()=>{
+export const createAuthor = async (req, res)=>{
     try {
         const { authorName } = req.body
         const newAuthor = await prisma.author.create({
@@ -32,6 +32,26 @@ export const createAuthor = async ()=>{
             data: newAuthor
         });
     } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message : "An Error Has Occured",
+        });
+    }
+}
+
+export const deleteAuthor = async (req, res)=>{
+    try {
+        const { authorId } = req.body
+        await prisma.author.delete({
+            where:{
+                id : authorId
+            }
+        })
+        return res.status(200).send({
+            message : "SUCCESS"
+        });
+    } catch (error) {
+        console.log(error)
         return res.status(500).send({
             message : "An Error Has Occured",
         });
