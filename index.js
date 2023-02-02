@@ -2,7 +2,7 @@ import express from 'express';
 import authRouter from './routes/auth.js';
 import cors from 'cors';
 import config from './config/app.js';
-import Socket from './loaders/socket.js';
+import SocketLoader from './loaders/socket.js';
 import bookRoute from './routes/books.js';
 import orderRoute from './routes/order.js';
 import authorRoute from './routes/author.js';
@@ -22,4 +22,4 @@ app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);
 });
 
-export const orderSocket = new Socket(app, 3001);
+export const orderSocket = new SocketLoader(app, 3001, '/order');
