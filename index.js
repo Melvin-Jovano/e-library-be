@@ -4,6 +4,7 @@ import cors from 'cors';
 import config from './config/app.js';
 import Socket from './loaders/socket.js';
 import bookRoute from './routes/books.js';
+import orderRoute from './routes/order.js';
 
 const app = express();
 
@@ -13,9 +14,10 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(authRouter);
 app.use(bookRoute);
+app.use(orderRoute);
 
 app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);
 });
 
-// export const chatSocket = new Socket(app, 3001);
+export const orderSocket = new Socket(app, 3001);

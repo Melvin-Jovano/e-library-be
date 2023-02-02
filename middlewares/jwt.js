@@ -1,5 +1,7 @@
-import { verify } from "jsonwebtoken";
 import config from "../config/app.js";
+import pkg from 'jsonwebtoken';
+
+const { verify, TokenExpiredError } = pkg;
 
 export const checkJWTUser = async (req, res, next) => {
     try {
@@ -10,20 +12,32 @@ export const checkJWTUser = async (req, res, next) => {
 
         const token = bearerHeader.split(' ')[1];
 
-        verify(token, config.ACCESS_TOKEN_SECRET_USER, function(err, decoded) {
-            if (err !== null) {
-                if(err.name === 'TokenExpiredError') {
+        let payload = {};
+
+        try {
+            try {
+                payload = verify(token, config.ACCESS_TOKEN_SECRET_USER);
+            } catch (error) {
+                if (error instanceof TokenExpiredError) {
                     return res.status(401).send({
                         message: 'EXPIRED_TOKEN',
                     });
                 }
-                if(err.name === 'JsonWebTokenError') {
-                    throw Error();
-                }
+                payload = verify(token, config.ACCESS_TOKEN_SECRET_ADMIN);
             }
-            res.locals.payload = decoded;
-            next();
-        });
+        } catch (error) {
+            if (error instanceof TokenExpiredError) {
+                return res.status(401).send({
+                    message: 'EXPIRED_TOKEN',
+                });
+            }
+            return res.status(401).send({
+                message: 'INVALID_TOKEN',
+            });
+        }
+
+        res.locals.payload = payload;
+        next();
     } catch (error) {
         return res.status(401).send({
             message: 'INVALID_TOKEN',
@@ -39,33 +53,20 @@ export const checkJWTAdmin = async (req, res, next) => {
         }
 
         const token = bearerHeader.split(' ')[1];
-
+        
         verify(token, config.ACCESS_TOKEN_SECRET_ADMIN, function(err, decoded) {
             if (err !== null) {
-                if(err.name === 'JsonWebTokenError') {
-                    verify(token, config.ACCESS_TOKEN_SECRET_USER, function(err, decoded) {
-                        if (err !== null) {
-                            if(err.name === 'TokenExpiredError') {
-                                return res.status(401).send({
-                                    message: 'EXPIRED_TOKEN',
-                                });
-                            }
-                            if(err.name === 'JsonWebTokenError') {
-                                throw Error();
-                            }
-                            res.locals.payload = decoded;
-                            return next();
-                        }
-                    });
-                }
                 if(err.name === 'TokenExpiredError') {
                     return res.status(401).send({
                         message: 'EXPIRED_TOKEN',
                     });
                 }
+                if(err.name === 'JsonWebTokenError') {
+                    throw Error();
+                }
             }
             res.locals.payload = decoded;
-            return next();
+            next();
         });
     } catch (error) {
         return res.status(401).send({
