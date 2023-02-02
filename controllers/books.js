@@ -77,7 +77,6 @@ export const inputBook = async (req, res)=>{
             data: book
         });
     } catch (error) {
-        console.log(error)
         return res.status(500).send({
             message : "An Error Has Occured",
         });
@@ -97,7 +96,7 @@ export const getAllBooks = async (req,res)=>{
         }
 
         const data = await prisma.book.findMany({
-            orderBy: [{id: 'asc'}],
+            orderBy: [{id: 'desc'}],
             take: Number(limit) + 1,
             where: {
                 ...idFilter
@@ -131,7 +130,6 @@ export const getAllBooks = async (req,res)=>{
             }
         });
     } catch (error) {
-        console.log(error)
         return res.status(500).send({
             message : "An Error Has Occured",
         });
