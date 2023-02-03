@@ -14,8 +14,8 @@ export default class SocketLoader {
             }
         });
 
-        this.socket = this.io.of(`${room}`);
         this.io.listen(port);
+        this.socket = this.io.of(room);
         this.socket.use(validateAccessTokenUser);
 
         this.socket.on("connect", (socket) => {
@@ -43,7 +43,7 @@ export default class SocketLoader {
                             }
                         }
                     });
-                    socket.emit('created-order', order);
+                    this.socket.emit('created-order', order);
                 });
 
                 socket.on('delete-order', async (body) => {
@@ -63,7 +63,16 @@ export default class SocketLoader {
                             }
                         }
                     });
-                    socket.emit('deleted-order', {user_id: body.userId});
+                    this.socket.emit('deleted-order', {user_id: body.userId});
+                });
+
+                socket.on('delete-order-by-user-id', async (userId) => {
+                    await prisma.order.deleteMany({
+                        where: {
+                            user_id: userId
+                        },
+                    });
+                    this.socket.emit('total-order', {user_id: userId, total: 0});
                 });
             }
         });
