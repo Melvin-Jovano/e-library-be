@@ -2,19 +2,21 @@ import { PrismaClient } from '@prisma/client';
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
+import sharp from 'sharp';
+import config from '../config/app.js';
+import fs from 'fs';
 
 const prisma = new PrismaClient()
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
-        cb(null, "public/images")
+        cb(null, config.IMG_UPLOAD_DIR)
     },
     filename: function(req, file, cb){
-        const extension = path.extname(file.originalname);
-        const fileName = uuidv4() + extension;
-        cb(null, fileName)
+        cb(null, uuidv4() + path.extname(file.originalname))
     }
-})
+});
+
 export const upload = multer({
     storage,
     fileFilter: function(req, file, cb){
@@ -31,9 +33,31 @@ export const upload = multer({
 
 export const inputBook = async (req, res)=>{
     try {
-        const coverImg = req.file.filename
-        const fileUrl = `/images/${coverImg}`;
-        const {title, description, published, pages, authorId, stock} = req.body
+        let fileUrl = `/images/${req.file.filename}`;
+        const {title, description, published, pages, authorId, stock} = req.body;
+
+        if(req.file.size > config.IMG_LIMIT_SIZE) {
+            const size = (await fs.promises.stat(req.file.path)
+                .then((respond) => {
+                    return respond.size;
+                })
+                .catch((error) => {
+                    return -1;
+                }));
+
+            const sizeAcceptedInPercent = Math.floor((size - (size - (config.IMG_LIMIT_SIZE / 2))) / (size / 100));
+
+            await sharp(req.file.path)
+            .jpeg({quality : sizeAcceptedInPercent})
+            .toFile(`${config.IMG_UPLOAD_DIR}/compress-${req.file.filename}`)
+            .then((res) => {
+                fileUrl = `/images/compress-${req.file.filename}`;
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+        }
+
         const book = await prisma.book.create({
             data:{
                 title : title,
@@ -50,6 +74,7 @@ export const inputBook = async (req, res)=>{
             data: book
         });
     } catch (error) {
+        console.error(error);
         return res.status(500).send({
             message : "An Error Has Occured",
         });
