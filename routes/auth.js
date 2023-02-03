@@ -5,7 +5,8 @@ import {
     registerUser, 
     registerAdmin,
     refreshTokenUser,
-    refreshTokenAdmin, 
+    refreshTokenAdmin,
+    getUsername
 } from "../controllers/auth.js";
 
 const authRouter = express.Router();
@@ -18,5 +19,7 @@ authRouter.put('/auth/user/refresh', refreshTokenUser);
  
 authRouter.put('/auth/admin/register', registerAdmin);
 authRouter.put('/auth/admin/refresh', refreshTokenAdmin);
+
+authRouter.get('/auth/username/:username', getUsername);
 
 export default authRouter;

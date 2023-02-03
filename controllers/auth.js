@@ -25,13 +25,13 @@ export const login = async ( req, res ) => {
             if(isPasswordMatch) {
                 const accessToken = sign({
                     userId: getUserByUsernameAndPassword.id
-                }, config.ACCESS_TOKEN_SECRET_USER, {
+                }, getUserByUsernameAndPassword.role === 'USER' ? config.ACCESS_TOKEN_SECRET_USER : config.ACCESS_TOKEN_SECRET_ADMIN, {
                     expiresIn: '10m'
                 });
 
                 const refresh_token = sign({
                     userId: getUserByUsernameAndPassword.id
-                }, config.REFRESH_TOKEN_SECRET_USER);
+                }, getUserByUsernameAndPassword.role === 'USER' ? config.REFRESH_TOKEN_SECRET_USER : config.REFRESH_TOKEN_SECRET_ADMIN);
 
                 // Insert New Token
                 await prisma.jwt.create({
@@ -311,6 +311,47 @@ export const registerAdmin = async ( req, res ) => {
 
         return res.status(409).send({
             message: 'Username Already Exist',
+        });
+    } catch (error) {
+        return res.status(500).send({
+            message : 'An Error Has Occured'
+        });
+    }
+}
+
+export const getUsername = async ( req, res ) => {
+    try {
+        const {username} = req.params;
+
+        const checkUsername = validateUsername(username);
+
+        if(!checkUsername) {
+            return res.status(403).send({
+                message: `Invalid Username (No Spaces And All Lowercase)`,
+            });
+        }
+
+        if(checkUsername === null) {
+            return res.status(500).send({
+                message : 'An Error Has Occured'
+            });
+        }
+
+        const data = await prisma.user.findMany({
+            where: {
+                username : {
+                    contains: username
+                }
+            },
+            select: {
+                id: true,
+                username: true
+            }
+        });
+
+        return res.status(201).send({
+            message: `SUCCESS`,
+            data
         });
     } catch (error) {
         return res.status(500).send({
