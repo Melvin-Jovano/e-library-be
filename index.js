@@ -16,7 +16,7 @@ app.use(express.static("public"));
 app.use(authRouter);
 app.use(bookRoute);
 app.use(orderRoute);
-app.use(authorRoute)
+app.use(authorRoute);
 
 app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);

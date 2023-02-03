@@ -69,7 +69,12 @@ export const getOrderByUserId = async (req, res)=>{
 
 export const getOrderCountByUserId = async (req, res)=>{
     try {
-        const {userId} = res.locals.payload;
+        let {userId} = res.locals.payload;
+        const {user_id} = req.query;
+
+        if(user_id !== undefined) {
+            userId = Number(user_id);
+        }
 
         const orderCount = await prisma.order.count({
             where: {
