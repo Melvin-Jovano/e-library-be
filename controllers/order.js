@@ -4,9 +4,13 @@ const prisma = new PrismaClient()
 
 export const getOrderByUserId = async (req, res)=>{
     try {
-        const {userId} = res.locals.payload;
-        const {limit, last_id} = req.query;
+        let {userId} = res.locals.payload;
+        const {limit, last_id, user_id} = req.query;
         let [limitFilter, lastIdFilter] = [10, null];
+
+        if(user_id !== undefined) {
+            userId = Number(user_id);
+        }
 
         if(limit !== undefined) {
             limitFilter = Number(limit);
