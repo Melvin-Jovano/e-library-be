@@ -1,13 +1,13 @@
 import express from "express";
 import { deleteBook, getAllBooks, getBookById, inputBook, updateBook, upload } from "../controllers/books.js";
-import {checkJWTUser} from '../middlewares/jwt.js';
+import {checkJWTAdmin, checkJWTUser} from '../middlewares/jwt.js';
 
 const bookRoute = express.Router();
 
-bookRoute.post('/book', checkJWTUser, upload.single('Cover'), inputBook);
-bookRoute.get('/books', getAllBooks);
+bookRoute.post('/book', checkJWTAdmin, upload.single('Cover'), inputBook);
+bookRoute.get('/books', checkJWTUser, getAllBooks);
 bookRoute.get('/book/:bookId', checkJWTUser, getBookById);
-bookRoute.put('/updatebook', updateBook);
-bookRoute.delete('/deletebook/:id', deleteBook);
+bookRoute.put('/updatebook', checkJWTAdmin, updateBook);
+bookRoute.delete('/deletebook/:id', checkJWTAdmin, deleteBook);
 
 export default bookRoute; 

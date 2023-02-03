@@ -4,7 +4,7 @@ dotenv.config();
 const config = {
     APP_NAME: 'INSOMNIA',
     APP_PORT: process.env.APP_PORT,
-    CHAT_SOCKET_PORT: process.env.CHAT_SOCKET_PORT,
+    SOCKET_PORT: process.env.SOCKET_PORT,
     ACCESS_TOKEN_SECRET_USER: 'roses-are-red',
     REFRESH_TOKEN_SECRET_USER: 'violets-are-blue',
 

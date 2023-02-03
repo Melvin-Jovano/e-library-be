@@ -1,7 +1,7 @@
 import express from "express";
 import {
     login,
-    logout,
+    logout, 
     registerUser, 
     registerAdmin,
     refreshTokenUser,
