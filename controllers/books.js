@@ -173,7 +173,7 @@ export const updateBook = async (req,res)=>{
 
 export const deleteBook = async (req, res)=>{
     try {
-        const { bookId } = req.body
+        const bookId = req.params.id
         await prisma.book.delete({
             where:{
                 id : parseInt(bookId)

@@ -8,6 +8,6 @@ bookRoute.post('/book', checkJWTUser, upload.single('Cover'), inputBook);
 bookRoute.get('/books', getAllBooks);
 bookRoute.get('/book/:bookId', checkJWTUser, getBookById);
 bookRoute.put('/updatebook', updateBook);
-bookRoute.delete('/deletebook', deleteBook);
+bookRoute.delete('/deletebook/:id', deleteBook);
 
 export default bookRoute; 
