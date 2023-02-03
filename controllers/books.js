@@ -149,7 +149,7 @@ export const updateBook = async (req,res)=>{
         const { bookId, stock } = req.body
         const book = await prisma.book.update({
             where:{
-                id : bookId
+                id : parseInt(bookId)
             },
             data:{
                 stock : stock
