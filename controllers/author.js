@@ -19,6 +19,18 @@ export const getAllAuthors = async (req,res)=>{
 export const createAuthor = async (req, res)=>{
     try {
         const { authorName } = req.body
+        const checkAuthor = await prisma.author.findFirst({
+            where:{
+                name : authorName
+            }
+        })
+
+        if (checkAuthor !== null){
+            return res.status(409).send({
+                message : "DUPLICATE",
+            });
+        }
+
         const newAuthor = await prisma.author.create({
             data:{
                 name: authorName
