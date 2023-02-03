@@ -176,7 +176,7 @@ export const deleteBook = async (req, res)=>{
         const { bookId } = req.body
         await prisma.book.delete({
             where:{
-                id : bookId
+                id : parseInt(bookId)
             }
         })
         return res.status(200).send({
